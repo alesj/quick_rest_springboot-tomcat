@@ -37,7 +37,7 @@ public class RestApplicationTest {
 
     @Test
     public void callServiceTest() {
-        Greeting message = template.getForObject("http://localhost:" + port + "/greeting",Greeting.class);
+        Greeting message = template.getForObject("http://localhost:" + port + "/greeting", Greeting.class);
         Assert.assertEquals("Hello, World!", message.getContent());
         Assert.assertEquals(1, message.getId());
     }
