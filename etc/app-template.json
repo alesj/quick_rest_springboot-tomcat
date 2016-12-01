@@ -42,8 +42,8 @@
     {
       "description": "The URL for the SSO server (e.g. https://secure-sso-myproject.example.com/auth).  This is the URL through which the user will be redirected when a login or token is required by the application.",
       "name": "SSO_URL",
-      "value": "",
-      "required": false
+      "value" : "http://sso-alesj.os2.usersys.redhat.com",
+      "required": true
     },
     {
       "description": "The SSO Client Secret for Confidential Access",
@@ -143,6 +143,12 @@
                     "name": "http",
                     "containerPort": 8080,
                     "protocol": "TCP"
+                  }
+                ],
+                "env": [
+                  {
+                    "name": "SSO_URL",
+                    "value": "${SSO_URL}/auth"
                   }
                 ]
               }
@@ -370,10 +376,6 @@
                   {
                     "name": "HOSTNAME_HTTPS",
                     "value": "${SSO_HOSTNAME_HTTPS}"
-                  },
-                  {
-                    "name": "SSO_URL",
-                    "value": "${SSO_URL}/auth"
                   },
                   {
                     "name": "SSO_IMPORT_FILE",
