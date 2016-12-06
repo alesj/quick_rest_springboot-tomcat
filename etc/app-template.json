@@ -22,6 +22,32 @@
       "required": true
     },
     {
+      "description": "Git source URI for application",
+      "name": "SOURCE_REPOSITORY_URL",
+      "value": "https://github.com/alesj/quick_rest_springboot-tomcat",
+      "required": true
+    },
+    {
+      "description": "Git branch/tag reference",
+      "name": "SOURCE_REPOSITORY_REF",
+      "value": "sso",
+      "required": false
+    },
+    {
+      "description": "GitHub trigger secret",
+      "name": "GITHUB_WEBHOOK_SECRET",
+      "from": "[a-zA-Z0-9]{8}",
+      "generate": "expression",
+      "required": true
+    },
+    {
+      "description": "Generic build trigger secret",
+      "name": "GENERIC_WEBHOOK_SECRET",
+      "from": "[a-zA-Z0-9]{8}",
+      "generate": "expression",
+      "required": true
+    },
+    {
       "description": "Custom hostname for http service route.  Leave blank for default hostname, e.g.: <application-name>-<project>.<default-domain-suffix>",
       "name": "HOSTNAME_HTTP",
       "value": "",
@@ -42,7 +68,7 @@
     {
       "description": "The URL for the SSO server (e.g. https://secure-sso-myproject.example.com/auth).  This is the URL through which the user will be redirected when a login or token is required by the application.",
       "name": "SSO_URL",
-      "value" : "http://sso-alesj.os2.usersys.redhat.com",
+      "value": "https://secure-sso-springboot-rest.b795.dev-preview-stg.openshiftapps.com",
       "required": true
     },
     {
@@ -56,6 +82,97 @@
       "description": "File path for keycloak.json configuration to load on start",
       "name": "SSO_IMPORT_FILE",
       "value": "/opt/sso-demo/sso-demo.json",
+      "required": false
+    },
+    {
+      "description": "The name of the secret containing the keystore file",
+      "name": "HTTPS_SECRET",
+      "value": "sso-app-secret",
+      "required": false
+    },
+    {
+      "description": "The name of the keystore file within the secret",
+      "name": "HTTPS_KEYSTORE",
+      "value": "keystore.jks",
+      "required": false
+    },
+    {
+      "description": "The type of the keystore file (JKS or JCEKS)",
+      "name": "HTTPS_KEYSTORE_TYPE",
+      "value": "",
+      "required": false
+    },
+    {
+      "description": "The name associated with the server certificate (e.g. jboss)",
+      "name": "HTTPS_NAME",
+      "value": "jboss",
+      "required": false
+    },
+    {
+      "description": "The password for the keystore and certificate (e.g. mykeystorepass)",
+      "name": "HTTPS_PASSWORD",
+      "value": "mykeystorepass",
+      "required": false
+    },
+    {
+      "description": "The name of the secret containing the keystore file",
+      "name": "JGROUPS_ENCRYPT_SECRET",
+      "value": "sso-app-secret",
+      "required": false
+    },
+    {
+      "description": "The name of the keystore file within the secret",
+      "name": "JGROUPS_ENCRYPT_KEYSTORE",
+      "value": "jgroups.jceks",
+      "required": false
+    },
+    {
+      "description": "The name associated with the server certificate (e.g. secret-key)",
+      "name": "JGROUPS_ENCRYPT_NAME",
+      "value": "",
+      "required": false
+    },
+    {
+      "description": "The password for the keystore and certificate (e.g. password)",
+      "name": "JGROUPS_ENCRYPT_PASSWORD",
+      "value": "",
+      "required": false
+    },
+    {
+      "description": "JGroups cluster password",
+      "name": "JGROUPS_CLUSTER_PASSWORD",
+      "from": "[a-zA-Z0-9]{8}",
+      "generate": "expression",
+      "required": true
+    },
+    {
+      "description": "The username used to access the SSO service.  This is used by clients to create the appliction client(s) within the specified SSO realm.",
+      "name": "SSO_SERVICE_USERNAME",
+      "value": "",
+      "required": false
+    },
+    {
+      "description": "The password for the SSO service user.",
+      "name": "SSO_SERVICE_PASSWORD",
+      "value": "",
+      "required": false
+    },
+    {
+      "description": "The name of the truststore file within the secret (e.g. truststore.jks)",
+      "name": "SSO_TRUSTSTORE",
+      "value": "",
+      "required": false
+    },
+    {
+      "description": "The password for the truststore and certificate (e.g. mykeystorepass)",
+      "name": "SSO_TRUSTSTORE_PASSWORD",
+      "value": "",
+      "required": false
+    },
+    {
+      "description": "The name of the secret containing the truststore file (e.g. truststore-secret). Used for volume secretName",
+      "name": "SSO_TRUSTSTORE_SECRET",
+      "value": "sso-app-secret",
       "required": false
     },
     {
@@ -331,6 +448,21 @@
                     "name": "sso-demo-volume",
                     "mountPath": "/opt/sso-demo",
                     "readOnly": true
+                  },
+                  {
+                    "name": "eap-keystore-volume",
+                    "mountPath": "/etc/eap-secret-volume",
+                    "readOnly": true
+                  },
+                  {
+                    "name": "eap-jgroups-keystore-volume",
+                    "mountPath": "/etc/jgroups-encrypt-secret-volume",
+                    "readOnly": true
+                  },
+                  {
+                    "name": "sso-truststore-volume",
+                    "mountPath": "/etc/sso-secret-volume",
+                    "readOnly": true
                   }
                 ],
                 "livenessProbe": {
@@ -340,7 +472,8 @@
                       "-c",
                       "/opt/eap/bin/livenessProbe.sh"
                     ]
-                  }
+                  },
+                  "initialDelaySeconds" : 180
                 },
                 "readinessProbe": {
                   "exec": {
@@ -380,6 +513,70 @@
                   {
                     "name": "SSO_IMPORT_FILE",
                     "value": "${SSO_IMPORT_FILE}"
+                  },
+                  {
+                    "name": "HTTPS_KEYSTORE_DIR",
+                    "value": "/etc/eap-secret-volume"
+                  },
+                  {
+                    "name": "HTTPS_KEYSTORE",
+                    "value": "${HTTPS_KEYSTORE}"
+                  },
+                  {
+                    "name": "HTTPS_KEYSTORE_TYPE",
+                    "value": "${HTTPS_KEYSTORE_TYPE}"
+                  },
+                  {
+                    "name": "HTTPS_NAME",
+                    "value": "${HTTPS_NAME}"
+                  },
+                  {
+                    "name": "HTTPS_PASSWORD",
+                    "value": "${HTTPS_PASSWORD}"
+                  },
+                  {
+                    "name": "JGROUPS_ENCRYPT_SECRET",
+                    "value": "${JGROUPS_ENCRYPT_SECRET}"
+                  },
+                  {
+                    "name": "JGROUPS_ENCRYPT_KEYSTORE_DIR",
+                    "value": "/etc/jgroups-encrypt-secret-volume"
+                  },
+                  {
+                    "name": "JGROUPS_ENCRYPT_KEYSTORE",
+                    "value": "${JGROUPS_ENCRYPT_KEYSTORE}"
+                  },
+                  {
+                    "name": "JGROUPS_ENCRYPT_NAME",
+                    "value": "${JGROUPS_ENCRYPT_NAME}"
+                  },
+                  {
+                    "name": "JGROUPS_ENCRYPT_PASSWORD",
+                    "value": "${JGROUPS_ENCRYPT_PASSWORD}"
+                  },
+                  {
+                    "name": "JGROUPS_CLUSTER_PASSWORD",
+                    "value": "${JGROUPS_CLUSTER_PASSWORD}"
+                  },
+                  {
+                    "name": "SSO_SERVICE_USERNAME",
+                    "value": "${SSO_SERVICE_USERNAME}"
+                  },
+                  {
+                    "name": "SSO_SERVICE_PASSWORD",
+                    "value": "${SSO_SERVICE_PASSWORD}"
+                  },
+                  {
+                    "name": "SSO_TRUSTSTORE",
+                    "value": "${SSO_TRUSTSTORE}"
+                  },
+                  {
+                    "name": "SSO_TRUSTSTORE_DIR",
+                    "value": "/etc/sso-secret-volume"
+                  },
+                  {
+                    "name": "SSO_TRUSTSTORE_PASSWORD",
+                    "value": "${SSO_TRUSTSTORE_PASSWORD}"
                   }
                 ]
               }
@@ -389,6 +586,24 @@
                 "name": "sso-demo-volume",
                 "secret": {
                   "secretName": "sso-demo-secret"
+                }
+              },
+              {
+                "name": "eap-keystore-volume",
+                "secret": {
+                  "secretName": "${HTTPS_SECRET}"
+                }
+              },
+              {
+                "name": "eap-jgroups-keystore-volume",
+                "secret": {
+                  "secretName": "${JGROUPS_ENCRYPT_SECRET}"
+                }
+              },
+              {
+                "name": "sso-truststore-volume",
+                "secret": {
+                  "secretName": "${SSO_TRUSTSTORE_SECRET}"
                 }
               }
             ]
