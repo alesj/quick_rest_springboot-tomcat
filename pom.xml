@@ -39,6 +39,8 @@
     <springboot-version>1.4.3.RELEASE</springboot-version>
     <tomcat.version>8.0.36</tomcat.version>
 
+    <ce-arq.version>1.0.1.Final-SNAPSHOT</ce-arq.version>
+
     <fabric8.maven.plugin.version>3.1.92</fabric8.maven.plugin.version>
     <maven-surefire-plugin.version>2.18.1</maven-surefire-plugin.version>
   </properties>
@@ -106,7 +108,7 @@
       <artifactId>arquillian-junit-container</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
+    <!-- dependency>
       <groupId>io.fabric8</groupId>
       <artifactId>fabric8-arquillian</artifactId>
       <scope>test</scope>
@@ -116,6 +118,25 @@
           <artifactId>httpclient-osgi</artifactId>
         </exclusion>
       </exclusions>
+    </dependency -->
+    <dependency>
+      <groupId>org.jboss.arquillian.container</groupId>
+      <artifactId>arquillian-ce-cube</artifactId>
+      <version>${ce-arq.version}</version>
+      <scope>test</scope>
+      <exclusions>
+        <!-- Hmmm, no port-fwd ... -->
+        <exclusion>
+          <groupId>io.undertow</groupId>
+          <artifactId>undertow-core</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.arquillian.container</groupId>
+      <artifactId>arquillian-ce-fabric8</artifactId>
+      <version>${ce-arq.version}</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
