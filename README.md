@@ -81,7 +81,7 @@ mvn clean install
 1. Use the Fabric8 Maven Plugin to launch the S2I process on the OpenShift Online machine & start the pod.
 
     ```
-    mvn clean fabric8:deploy -Popenshift  -DskipTests
+    mvn clean install -Popenshift  -DskipTests
     ```
     
 1. Get the route url.

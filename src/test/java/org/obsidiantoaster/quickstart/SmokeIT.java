@@ -20,9 +20,12 @@ import java.io.InputStream;
 import java.util.Collections;
 import java.util.Map;
 
+import org.jboss.arquillian.ce.adapter.OpenShiftAdapter;
 import org.jboss.arquillian.ce.api.OpenShiftHandle;
+import org.jboss.arquillian.ce.utils.Operator;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.arquillian.junit.InSequence;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.junit.Assert;
 import org.junit.Test;
@@ -31,6 +34,8 @@ import org.junit.runner.RunWith;
 @RunWith(Arquillian.class)
 @RunAsClient
 public class SmokeIT {
+
+    private final Map<String, String> labels = Collections.singletonMap("project", "springboot-rest");
 
     @ArquillianResource
     OpenShiftHandle handle;
@@ -49,18 +54,25 @@ public class SmokeIT {
             responseStream.close();
         }
         String content = baos.toString();
-        System.out.println("Response: " + content);
-        Assert.assertTrue(content.contains("SmokeIT"));
+        System.out.println("Response: >>" + content + "<<");
+        Assert.assertTrue("Bad response: " + content, content.contains("SmokeIT") && content.contains("Hello"));
     }
 
     @Test
+    @InSequence(1)
+    public void delay() throws Exception {
+        OpenShiftAdapter.class.cast(handle).delay(labels, 1, Operator.EQUAL);
+    }
+
+    @Test
+    @InSequence(2)
     public void testPodsGreetingEndpoint() throws Exception {
-        Map<String, String> labels = Collections.singletonMap("project", "springboot-rest");
         InputStream responseStream = handle.execute(labels, 0, 8080, "/greeting?name=SmokeIT");
         assertResponse(responseStream);
     }
 
     @Test
+    @InSequence(3)
     public void testPublicGreetingEndpoint() throws Exception {
 //        Route route = client.routes().get();
 //        System.out.println(route);

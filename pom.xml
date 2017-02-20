@@ -40,8 +40,9 @@
 
     <ce-arq.version>1.0.1.Final-SNAPSHOT</ce-arq.version>
 
-    <fabric8.maven.plugin.version>3.1.92</fabric8.maven.plugin.version>
-    <maven-surefire-plugin.version>2.18.1</maven-surefire-plugin.version>
+    <fabric8.maven.plugin.version>3.2.26</fabric8.maven.plugin.version>
+    <maven-surefire-plugin.version>2.19.1</maven-surefire-plugin.version>
+    <maven-failsafe-plugin.version>2.19.1</maven-failsafe-plugin.version>
   </properties>
 
   <dependencyManagement>
@@ -154,16 +155,31 @@
             <version>${fabric8.maven.plugin.version}</version>
             <executions>
               <execution>
+                <id>pre-resource</id>
+                <phase>prepare-package</phase>
                 <goals>
                   <goal>resource</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>pre-build</id>
+                <phase>package</phase>
+                <goals>
                   <goal>build</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>apply</id>
+                <phase>pre-integration-test</phase>
+                <goals>
+                  <goal>apply</goal>
                 </goals>
               </execution>
             </executions>
           </plugin>
           <plugin>
             <artifactId>maven-failsafe-plugin</artifactId>
-            <version>2.19.1</version>
+            <version>${maven-failsafe-plugin.version}</version>
             <executions>
               <execution>
                 <goals>
