@@ -37,7 +37,6 @@
 
     <fabric8.version>2.2.176</fabric8.version>
     <springboot-version>1.4.3.RELEASE</springboot-version>
-    <tomcat.version>8.0.36</tomcat.version>
 
     <ce-arq.version>1.0.1.Final-SNAPSHOT</ce-arq.version>
 
@@ -72,28 +71,6 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-tomcat</artifactId>
-    </dependency>
-
-    <!-- Tomcat -->
-    <dependency>
-      <groupId>org.apache.tomcat.embed</groupId>
-      <artifactId>tomcat-embed-core</artifactId>
-      <version>${tomcat.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.tomcat.embed</groupId>
-      <artifactId>tomcat-embed-el</artifactId>
-      <version>${tomcat.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.tomcat.embed</groupId>
-      <artifactId>tomcat-embed-websocket</artifactId>
-      <version>${tomcat.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.tomcat</groupId>
-      <artifactId>tomcat-juli</artifactId>
-      <version>${tomcat.version}</version>
     </dependency>
 
     <!-- Testing -->
